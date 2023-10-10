@@ -52,8 +52,7 @@ class _LoginRawState extends State<LoginRaw> {
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        final res = await ApiController.loginRaw(user, senha);
-                        print(res);
+                        await ApiController.loginRaw(user, senha);
                       }
                     },
                     style: ElevatedButton.styleFrom(

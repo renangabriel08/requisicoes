@@ -20,7 +20,6 @@ class _CadastroFotoState extends State<CadastroFoto> {
   String nome = '';
   String usuario = '';
   String celular = '';
-  String imagem = '';
 
   var image;
   Future abrirCamera(ImageSource source) async {
@@ -125,15 +124,14 @@ class _CadastroFotoState extends State<CadastroFoto> {
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        final res = await ApiController.cadastroFoto(
+                        await ApiController.cadastroFoto(
                           email,
                           senha,
                           nome,
                           usuario,
                           celular,
-                          imagem,
+                          File(image.path),
                         );
-                        print(res);
                       }
                     },
                     style: ElevatedButton.styleFrom(

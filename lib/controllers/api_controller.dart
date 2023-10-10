@@ -1,10 +1,22 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ApiController {
-  static loginRaw(String usuario, String senha) {
-    final url = Uri.parse('localhost:3000/tp01/usuarios/login');
+  static loginRaw(String usuario, String senha) async {
+    final url = Uri.parse('http://192.168.5.16:3000/tp01/usuarios/login');
+
+    final req = await http.post(
+      url,
+      body: {"usuario": usuario, "senha": senha},
+    );
+
+    if (req.statusCode == 200) {
+      final res = jsonDecode(utf8.decode(req.bodyBytes));
+      print(res);
+    } else {
+      print(req.statusCode);
+    }
   }
 
   static loginForm(String email, String senha) async {
@@ -31,15 +43,15 @@ class ApiController {
     );
     final req = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: {
         "nome": "teste",
         "email": "teste@gamil.com",
         "senha": "1234",
         "dr": "SP",
         "tipoUsuarioId": "1"
+      },
+      headers: {
+        'Content-Type': 'application/json',
       },
     );
 
@@ -73,8 +85,30 @@ class ApiController {
     String nome,
     String usuario,
     String celular,
-    String imagem,
-  ) {
-    final url = Uri.parse('localhost:3000/tp01/usuarios/cadastro');
+    File imagem,
+  ) async {
+    final url = Uri.parse('http://192.168.5.16:3000/tp01/usuarios/cadastro');
+    final stream = http.ByteStream(imagem.openRead());
+    final length = await imagem.length();
+    final req = http.MultipartRequest('POST', url);
+
+    req.fields['email'] = email;
+    req.fields['senha'] = senha;
+    req.fields['nome'] = nome;
+    req.fields['usuario'] = usuario;
+    req.fields['celular'] = celular;
+
+    req.files.add(
+      http.MultipartFile(
+        'imagem',
+        stream,
+        length,
+        filename: imagem.path.split('/').last,
+      ),
+    );
+
+    final res = await req.send();
+
+    print(res.statusCode);
   }
 }
